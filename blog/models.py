@@ -1,10 +1,15 @@
 from django.db import models
 from django.conf import settings
 
-class Blog(models.Model):
+class PublishedManager(models.Manager):
+    def get_queryset(self):
+        return super().get_queryset().filter(status=Post.Status.PUBLISHED)
+
+class Post(models.Model):
     class Status(models.TextChoices):
         DRAFT = 'DF','Draft'
         PUBLISHED = 'PB','Published'
+
     title = models.CharField(max_length=250)
     slug = models.CharField(max_length=250)
     author = models.ForeignKey(
@@ -22,7 +27,7 @@ class Blog(models.Model):
     class Meta:
         ordering = ['-published']
         indexes = [
-            models.Index(['-published'])
+            models.Index(fields=['-published'])
         ]
 
     def __str__(self):
